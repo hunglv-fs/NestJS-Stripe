@@ -52,4 +52,27 @@ export class StripeService {
       reason: 'requested_by_customer' as Stripe.RefundCreateParams.Reason,
     });
   }
+
+  async createProduct(name: string, description?: string): Promise<Stripe.Product> {
+    return this.stripe.products.create({
+      name,
+      description,
+    });
+  }
+
+  async createPrice(productId: string, amount: number, currency: string): Promise<Stripe.Price> {
+    return this.stripe.prices.create({
+      product: productId,
+      unit_amount: amount,
+      currency,
+    });
+  }
+
+  async createCustomer(name: string, email: string, phone?: string): Promise<Stripe.Customer> {
+    return this.stripe.customers.create({
+      name,
+      email,
+      phone,
+    });
+  }
 }

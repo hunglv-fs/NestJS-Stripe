@@ -9,6 +9,12 @@ export class AppController {
       version: '0.0.1',
       description: 'A payment processing system built with NestJS and Stripe',
       endpoints: {
+        users: 'POST /users - Create new user',
+        getUsers: 'GET /users - Get all users',
+        getUser: 'GET /users/:id - Get user by ID',
+        products: 'POST /products - Create new product',
+        getProducts: 'GET /products - Get all products',
+        getProduct: 'GET /products/:id - Get product by ID',
         orders: 'POST /orders - Create new order',
         createIntent: 'POST /payments/create-intent - Create payment intent',
         createCheckout: 'POST /payments/create-checkout-session - Create checkout session',
