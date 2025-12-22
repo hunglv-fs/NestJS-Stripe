@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Payment Form</title>
+        <script src="https://js.stripe.com/v3/"></script>
+    </head>
+    <body>
+        <h1>Stripe Payment Form</h1>
+            <form id="payment-form" >
+            <div id="card-element"></div>
+            <button>Pay</button>
+        </form>
+
+        <script>
+        const stripe = Stripe('pk_test_51NIXXAIVe5Vysl5OolEui92DGgCgNSEEIRcKmdJ0wgua3erugZmBKXwpJh7iY4CiEkvD8CM0QPFcvZswDcNWFhn000yg0Pm2pL');
+        const elements = stripe.elements();
+        const card = elements.create('card');
+        card.mount('#card-element');
+
+        const clientSecret = 'pi_3Sg5XqIVe5Vysl5O2nz26F5W_secret_1hxz7fHC7GiCNIFLWCZw3b3Ly';
+
+        document.getElementById('payment-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            await stripe.confirmCardPayment(clientSecret, {
+            payment_method: { card }
+            });
+        });
+        </script>
+</body>
+</html>
