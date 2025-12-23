@@ -114,4 +114,19 @@ export class UserService {
       throw error;
     }
   }
+
+  async updateLastLogin(id: string): Promise<void> {
+    this.loggerService.info('Updating last login for user', { userId: id });
+    try {
+      await this.userRepository.update(id, { lastLoginAt: new Date() });
+      this.loggerService.info('Last login updated successfully', { userId: id });
+    } catch (error) {
+      this.loggerService.error('Failed to update last login', {
+        userId: id,
+        error: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
+  }
 }
