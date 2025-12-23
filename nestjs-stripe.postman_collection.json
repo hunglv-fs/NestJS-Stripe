@@ -23,6 +23,20 @@
       "item": [
         {
           "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.access_token);",
+                  "    console.log('JWT token saved:', response.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -33,7 +47,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\"\n}"
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"0123456789\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -110,18 +124,23 @@
       "name": "Users",
       "item": [
         {
-          "name": "Create User",
+          "name": "Create User (ADMIN)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\"\n}"
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"0123456789\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/users",
@@ -135,10 +154,16 @@
           }
         },
         {
-          "name": "Get All Users",
+          "name": "Get All Users (ADMIN)",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/users",
               "host": [
@@ -151,10 +176,16 @@
           }
         },
         {
-          "name": "Get User by ID",
+          "name": "Get User by ID (Authenticated)",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/users/:id",
               "host": [
@@ -169,9 +200,162 @@
                   "key": "id",
                   "value": "17c82430-92ce-4c6a-a9d8-00d6f22d0b34",
                   "description": "User UUID"
+    },
+    {
+      "name": "RBAC Management (ADMIN Only)",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rbac/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "rbac",
+                "roles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rbac/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "rbac",
+                "permissions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Assign Role to User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-uuid-here\",\n  \"roleName\": \"STAFF\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/rbac/users/assign-role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "rbac",
+                "users",
+                "assign-role"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Roles & Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rbac/users/:userId/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "rbac",
+                "users",
+                ":userId",
+                "details"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "user-uuid-here",
+                  "description": "User UUID to get roles and permissions for"
                 }
               ]
             }
+          }
+        },
+        {
+          "name": "Remove Role from User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rbac/users/:userId/roles/:roleId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "rbac",
+                "users",
+                ":userId",
+                "roles",
+                ":roleId"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "user-uuid-here",
+                  "description": "User UUID"
+                },
+                {
+                  "key": "roleId",
+                  "value": "role-uuid-here",
+                  "description": "Role UUID to remove"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
           }
         }
       ]
@@ -180,13 +364,18 @@
       "name": "Products",
       "item": [
         {
-          "name": "Create Product",
+          "name": "Create Product (ADMIN)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
               }
             ],
             "body": {
@@ -250,13 +439,18 @@
       "name": "Orders",
       "item": [
         {
-          "name": "Create Order",
+          "name": "Create Order (Authenticated)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
               }
             ],
             "body": {
@@ -280,13 +474,18 @@
       "name": "Payments",
       "item": [
         {
-          "name": "Create Payment Intent",
+          "name": "Create Payment Intent (Authenticated)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
               }
             ],
             "body": {
@@ -306,13 +505,18 @@
           }
         },
         {
-          "name": "Create Checkout Session",
+          "name": "Create Checkout Session (Authenticated)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
               }
             ],
             "body": {
@@ -332,13 +536,18 @@
           }
         },
         {
-          "name": "Request Refund",
+          "name": "Request Refund (ADMIN)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
               }
             ],
             "body": {
@@ -358,10 +567,16 @@
           }
         },
         {
-          "name": "Payment Success",
+          "name": "Payment Success (Authenticated)",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/payments/success?session_id=cs_test_1234567890",
               "host": [
@@ -382,10 +597,16 @@
           }
         },
         {
-          "name": "Payment Cancel",
+          "name": "Payment Cancel (Authenticated)",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/payments/cancel",
               "host": [

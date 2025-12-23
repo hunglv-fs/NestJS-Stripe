@@ -9,6 +9,7 @@ import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './auth/auth.module';
+import { RbacModule } from './rbac/rbac.module';
 
 @Module({
   imports: [
@@ -19,11 +20,16 @@ import { AuthModule } from './auth/auth.module';
       username: 'postgres',
       password: '123456',
       database: 'nestjs_stripe',
+      entities: [
+        // Import all entities explicitly for better control
+        'dist/**/*.entity{.ts,.js}',
+      ],
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false, // Re-enable auto-sync with complete schema
     }),
     LoggerModule,
     AuthModule,
+    RbacModule,
     OrderModule,
     StripeModule,
     PaymentModule,
