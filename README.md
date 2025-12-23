@@ -21,225 +21,208 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/nestjs_stripe
 npm run dev:start
 ```
 
-## API Endpoints
+## API Endpoints (cURL Commands)
 
 ### Home
-**GET** `/`
-```json
-Response:
-{
-  "name": "NestJS Stripe Payment System",
-  "version": "0.0.1",
-  "description": "A payment processing system built with NestJS and Stripe",
-  "endpoints": {
-    "orders": "POST /orders - Create new order",
-    "createIntent": "POST /payments/create-intent - Create payment intent",
-    "createCheckout": "POST /payments/create-checkout-session - Create checkout session",
-    "requestRefund": "POST /payments/request-refund - Request refund",
-    "webhook": "POST /payments/webhook - Stripe webhook handler"
-  },
-  "status": "running"
-}
+```bash
+curl -X GET http://localhost:3000/
 ```
 
 ### Users
 
-**POST** `/users`
-```json
-Request:
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "+1234567890"
-}
-
-Response:
-{
-  "id": "uuid",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "+1234567890",
-  "stripeCustomerId": "cus_stripe_id",
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-01T00:00:00.000Z"
-}
-```
-
-**GET** `/users`
-```json
-Response:
-[
-  {
-    "id": "uuid",
+**Create User**
+```bash
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{
     "name": "John Doe",
     "email": "john@example.com",
-    "phone": "+1234567890",
-    "stripeCustomerId": "cus_stripe_id",
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-01-01T00:00:00.000Z"
-  }
-]
+    "phone": "+1234567890"
+  }'
 ```
 
-**GET** `/users/:id`
-```json
-Response:
-{
-  "id": "uuid",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "+1234567890",
-  "stripeCustomerId": "cus_stripe_id",
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-01T00:00:00.000Z"
-}
+**Get All Users**
+```bash
+curl -X GET http://localhost:3000/users
+```
+
+**Get User by ID**
+```bash
+curl -X GET http://localhost:3000/users/{userId}
 ```
 
 ### Products
 
-**POST** `/products`
-```json
-Request:
-{
-  "name": "Premium Plan",
-  "description": "Monthly hosting plan",
-  "price": 2000,
-  "currency": "usd"
-}
-
-Response:
-{
-  "id": "uuid",
-  "name": "Premium Plan",
-  "description": "Monthly hosting plan",
-  "price": 2000,
-  "currency": "usd",
-  "stripeProductId": "prod_stripe_id",
-  "stripePriceId": "price_stripe_id",
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-01T00:00:00.000Z"
-}
-```
-
-**GET** `/products`
-```json
-Response:
-[
-  {
-    "id": "uuid",
+**Create Product**
+```bash
+curl -X POST http://localhost:3000/products \
+  -H "Content-Type: application/json" \
+  -d '{
     "name": "Premium Plan",
     "description": "Monthly hosting plan",
     "price": 2000,
-    "currency": "usd",
-    "stripeProductId": "prod_stripe_id",
-    "stripePriceId": "price_stripe_id",
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-01-01T00:00:00.000Z"
-  }
-]
+    "currency": "usd"
+  }'
 ```
 
-**GET** `/products/:id`
-```json
-Response:
-{
-  "id": "uuid",
-  "name": "Premium Plan",
-  "description": "Monthly hosting plan",
-  "price": 2000,
-  "currency": "usd",
-  "stripeProductId": "prod_stripe_id",
-  "stripePriceId": "price_stripe_id",
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-01T00:00:00.000Z"
-}
+**Get All Products**
+```bash
+curl -X GET http://localhost:3000/products
+```
+
+**Get Product by ID**
+```bash
+curl -X GET http://localhost:3000/products/{productId}
 ```
 
 ### Orders
 
-**POST** `/orders`
-```json
-Request:
-{
-  "amount": 2000,
-  "currency": "usd"
-}
-
-Response:
-{
-  "id": "uuid",
-  "amount": 2000,
-  "currency": "usd",
-  "status": "pending",
-  "paymentIntentId": null,
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-01T00:00:00.000Z"
-}
+**Create Order**
+```bash
+curl -X POST http://localhost:3000/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 2000,
+    "currency": "usd"
+  }'
 ```
 
 ### Payments
 
-**POST** `/payments/create-intent`
-```json
-Request:
-{
-  "orderId": "uuid"
-}
-
-Response:
-{
-  "client_secret": "pi_xxx_secret_xxx"
-}
+**Create Payment Intent**
+```bash
+curl -X POST http://localhost:3000/payments/create-intent \
+  -H "Content-Type: application/json" \
+  -d '{
+    "orderId": "your-order-id-here"
+  }'
 ```
 
-**POST** `/payments/create-checkout-session`
-```json
-Request:
-{
-  "orderId": "uuid"
-}
-
-Response:
-{
-  "url": "https://checkout.stripe.com/c/pay/cs_test_xxx"
-}
+**Create Checkout Session**
+```bash
+curl -X POST http://localhost:3000/payments/create-checkout-session \
+  -H "Content-Type: application/json" \
+  -d '{
+    "orderId": "your-order-id-here"
+  }'
 ```
 
-**POST** `/payments/request-refund`
-```json
-Request:
-{
-  "orderId": "uuid",
-  "reason": "Customer request"
-}
-
-Response:
-{
-  "message": "Refund requested successfully"
-}
+**Request Refund**
+```bash
+curl -X POST http://localhost:3000/payments/request-refund \
+  -H "Content-Type: application/json" \
+  -d '{
+    "orderId": "your-order-id-here",
+    "reason": "Customer request"
+  }'
 ```
 
-**GET** `/payments/success?session_id=cs_xxx`
-```json
-Response:
-{
-  "message": "Payment successful",
-  "sessionId": "cs_xxx"
-}
+**Payment Success Callback**
+```bash
+curl -X GET "http://localhost:3000/payments/success?session_id=cs_test_your_session_id"
 ```
 
-**GET** `/payments/cancel`
-```json
-Response:
-{
-  "message": "Payment cancelled"
-}
+**Payment Cancel Callback**
+```bash
+curl -X GET http://localhost:3000/payments/cancel
 ```
 
-**POST** `/payments/webhook`
-- Stripe webhook endpoint
-- Handles events: `payment_intent.succeeded`, `payment_intent.payment_failed`, `checkout.session.completed`
-- Updates order status automatically
+**Stripe Webhook**
+```bash
+curl -X POST http://localhost:3000/payments/webhook \
+  -H "Content-Type: application/json" \
+  -H "stripe-signature: your-stripe-signature-here" \
+  -d '{
+    "type": "payment_intent.succeeded",
+    "data": {
+      "object": {
+        "id": "pi_test_payment_intent_id",
+        "status": "succeeded",
+        "amount": 2000,
+        "currency": "usd",
+        "metadata": {
+          "orderId": "your-order-id-here"
+        }
+      }
+    }
+  }'
+```
+
+## Example Usage Flow
+
+### 1. Complete Payment Flow
+
+```bash
+# Step 1: Create a user
+USER_RESPONSE=$(curl -s -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+1234567890"
+  }')
+
+echo "User created: $USER_RESPONSE"
+
+# Step 2: Create a product
+PRODUCT_RESPONSE=$(curl -s -X POST http://localhost:3000/products \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Premium Plan",
+    "description": "Monthly hosting plan",
+    "price": 2000,
+    "currency": "usd"
+  }')
+
+echo "Product created: $PRODUCT_RESPONSE"
+
+# Step 3: Create an order
+ORDER_RESPONSE=$(curl -s -X POST http://localhost:3000/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 2000,
+    "currency": "usd"
+  }')
+
+echo "Order created: $ORDER_RESPONSE"
+
+# Extract order ID (you'll need to parse this from the response)
+ORDER_ID="your-order-id-here"
+
+# Step 4: Create checkout session
+CHECKOUT_RESPONSE=$(curl -s -X POST http://localhost:3000/payments/create-checkout-session \
+  -H "Content-Type: application/json" \
+  -d "{\"orderId\": \"$ORDER_ID\"}")
+
+echo "Checkout session created: $CHECKOUT_RESPONSE"
+```
+
+### 2. Payment Intent Flow
+
+```bash
+# Create a payment intent (for direct payment processing)
+PAYMENT_INTENT_RESPONSE=$(curl -s -X POST http://localhost:3000/payments/create-intent \
+  -H "Content-Type: application/json" \
+  -d '{
+    "orderId": "your-order-id-here"
+  }')
+
+echo "Payment intent created: $PAYMENT_INTENT_RESPONSE"
+```
+
+### 3. Refund Flow
+
+```bash
+# Request a refund for an order
+REFUND_RESPONSE=$(curl -s -X POST http://localhost:3000/payments/request-refund \
+  -H "Content-Type: application/json" \
+  -d '{
+    "orderId": "your-order-id-here",
+    "reason": "Customer requested refund"
+  }')
+
+echo "Refund requested: $REFUND_RESPONSE"
+```
 
 ## Order Status Flow
 
@@ -256,12 +239,28 @@ Response:
 - **Dual storage**: Data stored in both database and Stripe
 - **Reference IDs**: `stripeCustomerId`, `stripeProductId`, `stripePriceId` for mapping
 
-## Testing
+## Webhook Events
 
-1. Create user: `POST /users`
-2. Create product: `POST /products`
-3. Create order: `POST /orders`
-4. Create checkout session: `POST /payments/create-checkout-session`
-5. Complete payment via Stripe Checkout
-6. Webhook automatically updates order status
-7. Request refund: `POST /payments/request-refund`
+The system handles the following Stripe webhook events:
+
+- `payment_intent.succeeded` - Updates order status to PAYMENT_SUCCEEDED
+- `payment_intent.payment_failed` - Updates order status to PAYMENT_FAILED
+- `checkout.session.completed` - Updates order status to PAYMENT_SUCCEEDED
+
+## Testing Checklist
+
+1. ✅ Create user: `POST /users`
+2. ✅ Create product: `POST /products`
+3. ✅ Create order: `POST /orders`
+4. ✅ Create checkout session: `POST /payments/create-checkout-session`
+5. ✅ Complete payment via Stripe Checkout
+6. ✅ Webhook automatically updates order status
+7. ✅ Request refund: `POST /payments/request-refund`
+
+## Notes
+
+- Replace `your-order-id-here`, `your-user-id-here`, etc. with actual IDs from responses
+- The webhook endpoint requires a valid Stripe signature header
+- Payment amounts are in cents (e.g., 2000 = $20.00 USD)
+- Default server URL assumes `http://localhost:3000`
+- Ensure your `.env` file has valid Stripe test keys for testing
