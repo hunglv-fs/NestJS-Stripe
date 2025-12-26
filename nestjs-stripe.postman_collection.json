@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "NestJS Stripe API",
-    "description": "API collection for NestJS Stripe integration project",
+    "name": "NestJS Multi-Payment API",
+    "description": "API collection for NestJS with Stripe and PayPal integration",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -18,6 +18,28 @@
     }
   ],
   "item": [
+    {
+      "name": "Home",
+      "item": [
+        {
+          "name": "Get API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "Get API information and available endpoints"
+          }
+        }
+      ]
+    },
     {
       "name": "Authentication",
       "item": [
@@ -124,7 +146,7 @@
       "name": "Users",
       "item": [
         {
-          "name": "Create User (ADMIN)",
+          "name": "Create User (Authenticated)",
           "request": {
             "method": "POST",
             "header": [
@@ -135,12 +157,12 @@
               {
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}",
-                "description": "JWT token required for admin access"
+                "description": "JWT token required for authenticated access"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"0123456789\"\n}"
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"password456\",\n  \"phone\": \"0987654321\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/users",
@@ -150,18 +172,19 @@
               "path": [
                 "users"
               ]
-            }
+            },
+            "description": "Create a new user (requires authentication)"
           }
         },
         {
-          "name": "Get All Users (ADMIN)",
+          "name": "Get All Users (Authenticated)",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}",
-                "description": "JWT token required for admin access"
+                "description": "JWT token required for authenticated access"
               }
             ],
             "url": {
@@ -172,7 +195,8 @@
               "path": [
                 "users"
               ]
-            }
+            },
+            "description": "Get all users (requires authentication)"
           }
         },
         {
@@ -198,164 +222,12 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "17c82430-92ce-4c6a-a9d8-00d6f22d0b34",
+                  "value": "user-uuid-here",
                   "description": "User UUID"
-    },
-    {
-      "name": "RBAC Management (ADMIN Only)",
-      "item": [
-        {
-          "name": "Get All Roles",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}",
-                "description": "JWT token required for admin access"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/rbac/roles",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "rbac",
-                "roles"
+                }
               ]
-            }
-          }
-        },
-        {
-          "name": "Get All Permissions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}",
-                "description": "JWT token required for admin access"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/rbac/permissions",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "rbac",
-                "permissions"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Assign Role to User",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}",
-                "description": "JWT token required for admin access"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"userId\": \"user-uuid-here\",\n  \"roleName\": \"STAFF\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/rbac/users/assign-role",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "rbac",
-                "users",
-                "assign-role"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get User Roles & Permissions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}",
-                "description": "JWT token required for admin access"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/rbac/users/:userId/details",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "rbac",
-                "users",
-                ":userId",
-                "details"
-              ],
-              "variable": [
-                {
-                  "key": "userId",
-                  "value": "user-uuid-here",
-                  "description": "User UUID to get roles and permissions for"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Remove Role from User",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}",
-                "description": "JWT token required for admin access"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/rbac/users/:userId/roles/:roleId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "rbac",
-                "users",
-                ":userId",
-                "roles",
-                ":roleId"
-              ],
-              "variable": [
-                {
-                  "key": "userId",
-                  "value": "user-uuid-here",
-                  "description": "User UUID"
-                },
-                {
-                  "key": "roleId",
-                  "value": "role-uuid-here",
-                  "description": "Role UUID to remove"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    }
-  ]
-}
+            "description": "Get user by ID (requires authentication)"
           }
         }
       ]
@@ -380,7 +252,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Premium Subscription\",\n  \"description\": \"Monthly premium subscription plan\",\n  \"price\": 29.99,\n  \"currency\": \"USD\"\n}"
+              "raw": "{\n  \"name\": \"Premium Subscription\",\n  \"description\": \"Monthly premium subscription plan\",\n  \"price\": 2999,\n  \"currency\": \"USD\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/products",
@@ -432,6 +304,83 @@
               ]
             }
           }
+        },
+        {
+          "name": "Sync Product to Payment Providers (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providers\": [\"stripe\", \"paypal\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/:id/sync",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                ":id",
+                "sync"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product-uuid-here",
+                  "description": "Product UUID to sync"
+                }
+              ]
+            },
+            "description": "Sync product to specified payment providers. Returns detailed success/failure information."
+          }
+        },
+        {
+          "name": "Get Product Sync Status (ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for admin access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/:id/sync-status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                ":id",
+                "sync-status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product-uuid-here",
+                  "description": "Product UUID to check sync status"
+                }
+              ]
+            },
+            "description": "Check which payment providers the product is synced to"
+          }
         }
       ]
     },
@@ -465,7 +414,8 @@
               "path": [
                 "orders"
               ]
-            }
+            },
+            "description": "Create a new order (requires authentication)"
           }
         }
       ]
@@ -473,6 +423,30 @@
     {
       "name": "Payments",
       "item": [
+        {
+          "name": "Get Available Payment Methods",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/methods",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "methods"
+              ]
+            },
+            "description": "Get list of available payment methods (stripe, paypal)"
+          }
+        },
         {
           "name": "Create Payment Intent (Authenticated)",
           "request": {
@@ -490,7 +464,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": \"17c82430-92ce-4c6a-a9d8-00d6f22d0b34\"\n}"
+              "raw": "{\n  \"orderId\": \"17c82430-92ce-4c6a-a9d8-00d6f22d0b34\",\n  \"paymentMethod\": \"stripe\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/payments/create-intent",
@@ -501,7 +480,8 @@
                 "payments",
                 "create-intent"
               ]
-            }
+            },
+            "description": "Create payment intent with specified payment method"
           }
         },
         {
@@ -521,7 +501,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": \"17c82430-92ce-4c6a-a9d8-00d6f22d0b34\"\n}"
+              "raw": "{\n  \"orderId\": \"17c82430-92ce-4c6a-a9d8-00d6f22d0b34\",\n  \"paymentMethod\": \"paypal\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/payments/create-checkout-session",
@@ -532,7 +517,8 @@
                 "payments",
                 "create-checkout-session"
               ]
-            }
+            },
+            "description": "Create checkout session with specified payment method"
           }
         },
         {
@@ -578,7 +564,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/payments/success?session_id=cs_test_1234567890",
+              "raw": "{{baseUrl}}/payments/success?session_id=cs_test_1234567890abcdef",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -589,11 +575,12 @@
               "query": [
                 {
                   "key": "session_id",
-                  "value": "cs_test_1234567890",
+                  "value": "cs_test_1234567890abcdef",
                   "description": "Stripe checkout session ID"
                 }
               ]
-            }
+            },
+            "description": "Handle successful payment redirect"
           }
         },
         {
@@ -616,7 +603,75 @@
                 "payments",
                 "cancel"
               ]
-            }
+            },
+            "description": "Handle cancelled payment redirect"
+          }
+        },
+        {
+          "name": "PayPal Payment Success (Authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/paypal/success?token=EC-1234567890&orderId=17c82430-92ce-4c6a-a9d8-00d6f22d0b34&PayerID=PAYER123",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "paypal",
+                "success"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "EC-1234567890",
+                  "description": "PayPal token"
+                },
+                {
+                  "key": "orderId",
+                  "value": "17c82430-92ce-4c6a-a9d8-00d6f22d0b34",
+                  "description": "Order ID"
+                },
+                {
+                  "key": "PayerID",
+                  "value": "PAYER123",
+                  "description": "PayPal Payer ID"
+                }
+              ]
+            },
+            "description": "Handle successful PayPal payment redirect"
+          }
+        },
+        {
+          "name": "PayPal Payment Cancel (Authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required for authenticated access"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/paypal/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "paypal",
+                "cancel"
+              ]
+            },
+            "description": "Handle cancelled PayPal payment redirect"
           }
         },
         {
@@ -639,15 +694,50 @@
               "raw": "{\n  \"id\": \"evt_test_webhook\",\n  \"object\": \"event\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_test_123\",\n      \"amount\": 2999\n    }\n  }\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/payments/webhook",
+              "raw": "{{baseUrl}}/payments/webhook/stripe",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "payments",
-                "webhook"
+                "webhook",
+                "stripe"
               ]
-            }
+            },
+            "description": "Stripe webhook endpoint for payment events"
+          }
+        },
+        {
+          "name": "PayPal Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "paypal-signature",
+                "value": "signature_here",
+                "description": "PayPal webhook signature for verification"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"WH-1234567890\",\n  \"event_type\": \"PAYMENT.CAPTURE.COMPLETED\",\n  \"resource\": {\n    \"id\": \"capture_id_here\",\n    \"amount\": {\n      \"value\": \"29.99\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/webhook/paypal",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "webhook",
+                "paypal"
+              ]
+            },
+            "description": "PayPal webhook endpoint for payment events"
           }
         }
       ]

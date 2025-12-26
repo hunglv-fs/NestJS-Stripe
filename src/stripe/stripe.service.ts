@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
+import { PaymentProvider, PaymentMethod } from '../payment/interfaces/payment-provider.interface';
 
 @Injectable()
-export class StripeService {
+export class StripeService implements PaymentProvider {
   private stripe: Stripe;
 
   constructor() {
@@ -11,20 +12,32 @@ export class StripeService {
     });
   }
 
-  async createPaymentIntent(amount: number, currency: string, metadata?: Record<string, string>): Promise<Stripe.PaymentIntent> {
-    return this.stripe.paymentIntents.create({
+  getProviderName(): string {
+    return PaymentMethod.STRIPE;
+  }
+
+  async createPaymentIntent(amount: number, currency: string, metadata?: Record<string, any>): Promise<{
+    id: string;
+    client_secret?: string;
+    approval_url?: string;
+  }> {
+    const paymentIntent = await this.stripe.paymentIntents.create({
       amount,
       currency,
       metadata,
     });
+
+    return {
+      id: paymentIntent.id,
+      client_secret: paymentIntent.client_secret,
+    };
   }
 
-  verifyWebhookSignature(rawBody: string | Buffer, signature: string, webhookSecret: string): Stripe.Event {
-    return this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-  }
-
-  async createCheckoutSession(amount: number, currency: string, orderId: string): Promise<Stripe.Checkout.Session> {
-    return this.stripe.checkout.sessions.create({
+  async createCheckoutSession(amount: number, currency: string, orderId: string): Promise<{
+    url: string;
+    id: string;
+  }> {
+    const session = await this.stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
@@ -43,29 +56,69 @@ export class StripeService {
         orderId,
       },
     });
+
+    return {
+      url: session.url,
+      id: session.id,
+    };
   }
 
-  async createRefund(paymentIntentId: string, amount: number, reason?: string): Promise<Stripe.Refund> {
-    return this.stripe.refunds.create({
-      payment_intent: paymentIntentId,
+  async createRefund(paymentId: string, amount?: number, reason?: string): Promise<{
+    id: string;
+    status: string;
+  }> {
+    const refund = await this.stripe.refunds.create({
+      payment_intent: paymentId,
       amount,
       reason: 'requested_by_customer' as Stripe.RefundCreateParams.Reason,
     });
+
+    return {
+      id: refund.id,
+      status: refund.status,
+    };
   }
 
-  async createProduct(name: string, description?: string): Promise<Stripe.Product> {
-    return this.stripe.products.create({
+  verifyWebhook(rawBody: Buffer | string, signature: string): any {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    return this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+  }
+
+  async createProduct(name: string, description?: string): Promise<{
+    id: string;
+    name: string;
+    description?: string;
+  }> {
+    const product = await this.stripe.products.create({
       name,
       description,
     });
+
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+    };
   }
 
-  async createPrice(productId: string, amount: number, currency: string): Promise<Stripe.Price> {
-    return this.stripe.prices.create({
+  async createPrice(productId: string, amount: number, currency: string): Promise<{
+    id: string;
+    product: string;
+    unit_amount: number;
+    currency: string;
+  }> {
+    const price = await this.stripe.prices.create({
       product: productId,
       unit_amount: amount,
       currency,
     });
+
+    return {
+      id: price.id,
+      product: typeof price.product === 'string' ? price.product : price.product.id,
+      unit_amount: price.unit_amount,
+      currency: price.currency,
+    };
   }
 
   async createCustomer(name: string, email: string, phone?: string): Promise<Stripe.Customer> {

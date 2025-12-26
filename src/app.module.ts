@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { OrderModule } from './order/order.module';
 import { StripeModule } from './stripe/stripe.module';
+import { PaypalModule } from './paypal/paypal.module';
 import { PaymentModule } from './payment/payment.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
@@ -32,6 +33,7 @@ import { RbacModule } from './rbac/rbac.module';
     RbacModule,
     OrderModule,
     StripeModule,
+    PaypalModule,
     PaymentModule,
     ProductModule,
     UserModule,

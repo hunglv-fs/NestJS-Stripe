@@ -23,6 +23,12 @@ export class Product {
   @Column({ name: 'stripe_price_id', nullable: true })
   stripePriceId: string;
 
+  @Column({ name: 'paypal_product_id', nullable: true })
+  paypalProductId: string;
+
+  @Column({ name: 'paypal_price_id', nullable: true })
+  paypalPriceId: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

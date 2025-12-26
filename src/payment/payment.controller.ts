@@ -5,6 +5,7 @@ import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { RequestRefundDto } from './dto/request-refund.dto';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PaymentMethod } from './interfaces/payment-provider.interface';
 
 // Using permission-based access for now
 // TODO: Replace with proper permission guards when implemented
@@ -16,14 +17,16 @@ export class PaymentController {
   @UseGuards(JwtAuthGuard)
   async createPaymentIntent(@Body() dto: CreatePaymentIntentDto) {
     // TODO: Add permission check for 'payment:create'
-    return this.paymentService.createPaymentIntent(dto.orderId);
+    const paymentMethod = dto.paymentMethod || PaymentMethod.STRIPE;
+    return this.paymentService.createPaymentIntent(dto.orderId, paymentMethod);
   }
 
   @Post('create-checkout-session')
   @UseGuards(JwtAuthGuard)
   async createCheckoutSession(@Body() dto: CreateCheckoutSessionDto) {
     // TODO: Add permission check for 'payment:create'
-    return this.paymentService.createCheckoutSession(dto.orderId);
+    const paymentMethod = dto.paymentMethod || PaymentMethod.STRIPE;
+    return this.paymentService.createCheckoutSession(dto.orderId, paymentMethod);
   }
 
   @Post('request-refund')
@@ -31,6 +34,14 @@ export class PaymentController {
   async requestRefund(@Body() dto: RequestRefundDto) {
     // TODO: Add permission check for 'payment:refund'
     return this.paymentService.requestRefund(dto.orderId, dto.reason);
+  }
+
+  @Get('methods')
+  @UseGuards(JwtAuthGuard)
+  async getAvailablePaymentMethods() {
+    return {
+      methods: this.paymentService.getAvailablePaymentMethods()
+    };
   }
 
   @Get('success')
@@ -45,12 +56,33 @@ export class PaymentController {
     return { message: 'Payment cancelled' };
   }
 
-  @Post('webhook')
+  @Post('webhook/stripe')
   @HttpCode(200)
-  async handleWebhook(
+  async handleStripeWebhook(
     @Req() req: Request,
     @Headers('stripe-signature') signature: string,
   ): Promise<void> {
-    await this.paymentService.handleWebhook(req.body, signature);
+    await this.paymentService.handleWebhook(req.body, signature, PaymentMethod.STRIPE);
+  }
+
+  @Post('webhook/paypal')
+  @HttpCode(200)
+  async handlePaypalWebhook(
+    @Req() req: Request,
+    @Headers('paypal-signature') signature: string,
+  ): Promise<void> {
+    await this.paymentService.handleWebhook(req.body, signature, PaymentMethod.PAYPAL);
+  }
+
+  @Get('paypal/success')
+  @UseGuards(JwtAuthGuard)
+  async paypalPaymentSuccess(@Query('token') token: string, @Query('PayerID') payerId: string) {
+    return { message: 'PayPal payment successful', token, payerId };
+  }
+
+  @Get('paypal/cancel')
+  @UseGuards(JwtAuthGuard)
+  async paypalPaymentCancel() {
+    return { message: 'PayPal payment cancelled' };
   }
 }
