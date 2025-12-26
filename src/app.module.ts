@@ -16,11 +16,11 @@ import { RbacModule } from './rbac/rbac.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '123456',
-      database: 'nestjs_stripe',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT) || 5432,
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || '123456',
+      database: process.env.DB_NAME || 'nestjs_stripe',
       entities: [
         // Import all entities explicitly for better control
         'dist/**/*.entity{.ts,.js}',

@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS products (
     currency VARCHAR(3) DEFAULT 'USD',
     stripe_product_id VARCHAR(255),
     stripe_price_id VARCHAR(255),
+    paypal_product_id VARCHAR(255),
+    paypal_price_id VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
