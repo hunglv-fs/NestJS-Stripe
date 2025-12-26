@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { Role } from './entities/role.entity';
-import { Permission } from './entities/permission.entity';
+import { Permission, PermissionModule, PermissionAction } from './entities/permission.entity';
 import { UserRole } from './entities/user-role.entity';
 import { RolePermission } from './entities/role-permission.entity';
 
@@ -140,5 +140,63 @@ export class RbacService {
       where: { isActive: true },
       order: { module: 'ASC', action: 'ASC' },
     });
+  }
+
+  // Ensure default "Registered User" role exists with basic permissions
+  async ensureRegisteredUserRole(): Promise<Role> {
+    const roleName = 'Registered User';
+
+    // Check if role already exists
+    let role = await this.roleRepository.findOne({
+      where: { name: roleName, isActive: true },
+      relations: ['rolePermissions', 'rolePermissions.permission'],
+    });
+
+    if (role) {
+      return role;
+    }
+
+    // Create the role if it doesn't exist
+    role = this.roleRepository.create({
+      name: roleName,
+      description: 'Default role for registered users with basic shopping permissions',
+    });
+
+    const savedRole = await this.roleRepository.save(role);
+
+    // Define permissions for registered users
+    const requiredPermissions = [
+      { module: PermissionModule.PRODUCT, action: PermissionAction.VIEW },
+      { module: PermissionModule.ORDER, action: PermissionAction.CREATE },
+      { module: PermissionModule.ORDER, action: PermissionAction.VIEW },
+      { module: PermissionModule.PAYMENT, action: PermissionAction.CREATE },
+      { module: PermissionModule.PAYMENT, action: PermissionAction.VIEW },
+      { module: PermissionModule.USER, action: PermissionAction.VIEW },
+      { module: PermissionModule.USER, action: PermissionAction.UPDATE },
+    ];
+
+    // Get or create permissions
+    const permissionIds: string[] = [];
+    for (const perm of requiredPermissions) {
+      let permission = await this.permissionRepository.findOne({
+        where: { module: perm.module, action: perm.action, isActive: true },
+      });
+
+      if (!permission) {
+        permission = this.permissionRepository.create({
+          module: perm.module,
+          action: perm.action,
+          description: `${perm.action} ${perm.module}`,
+        });
+        permission = await this.permissionRepository.save(permission);
+      }
+
+      permissionIds.push(permission.id);
+    }
+
+    // Assign permissions to role
+    await this.assignMultiplePermissionsToRole(savedRole.id, permissionIds);
+
+    return savedRole;
   }
 }

@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
+import { RbacService } from '../rbac/rbac.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/entities/user.entity';
@@ -10,6 +11,7 @@ import { User } from '../user/entities/user.entity';
 export class AuthService {
   constructor(
     private userService: UserService,
+    private rbacService: RbacService,
     private jwtService: JwtService,
   ) {}
 
@@ -46,6 +48,10 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
     });
+
+    // Assign default "Registered User" role to new user
+    const defaultRole = await this.rbacService.ensureRegisteredUserRole();
+    await this.rbacService.assignRoleToUser(user.id, defaultRole.id);
 
     const payload = { email: user.email, sub: user.id };
     return {
