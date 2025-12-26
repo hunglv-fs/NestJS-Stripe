@@ -62,7 +62,7 @@ export class PaymentService {
     return { url: session.url };
   }
 
-  async requestRefund(orderId: string, reason?: string): Promise<{ message: string }> {
+  async requestRefund(orderId: string, reason?: string): Promise<{ id: string; status: string; message: string }> {
     const order = await this.orderRepository.findOne({ where: { id: orderId } });
     if (!order) {
       throw new NotFoundException('Order not found');
@@ -88,7 +88,7 @@ export class PaymentService {
       order.status = 'REFUND_REQUESTED';
       await this.orderRepository.save(order);
 
-      return { message: 'Refund requested successfully' };
+      return { ...refund, message: 'Refund requested successfully' };
     } catch (err) {
       console.error('Refund creation failed:', err);
       throw new Error(`Refund creation failed: ${err.message}`);

@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/user.service';
@@ -38,7 +38,7 @@ export class JwtMiddleware implements NestMiddleware {
           roles: user.roles,
         };
       }
-    } catch (error) {
+    } catch {
       // Token invalid, continue without user
     }
 

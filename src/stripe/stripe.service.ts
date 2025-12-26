@@ -70,7 +70,7 @@ export class StripeService implements PaymentProvider {
     const refund = await this.stripe.refunds.create({
       payment_intent: paymentId,
       amount,
-      reason: 'requested_by_customer' as Stripe.RefundCreateParams.Reason,
+      reason: reason ? (reason as Stripe.RefundCreateParams.Reason) : 'requested_by_customer',
     });
 
     return {

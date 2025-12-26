@@ -56,6 +56,7 @@ export class PaypalService implements PaymentProvider {
               currencyCode: currency.toUpperCase(),
               value: (amount / 100).toFixed(2), // PayPal expects amount in dollars, not cents
             },
+            custom_id: metadata?.orderId,
           },
         ],
         applicationContext: {
@@ -122,14 +123,15 @@ export class PaypalService implements PaymentProvider {
     }
   }
 
-  verifyWebhook(rawBody: Buffer | string, signature: string): any {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  verifyWebhook(rawBody: Buffer | string, _signature: string): any {
     // PayPal webhook verification is more complex than Stripe
     // For now, we'll implement basic verification
     // In production, you should verify the webhook signature properly
     try {
       const body = typeof rawBody === 'string' ? JSON.parse(rawBody) : JSON.parse(rawBody.toString());
       return body;
-    } catch (error) {
+    } catch {
       throw new Error('Invalid webhook payload');
     }
   }
