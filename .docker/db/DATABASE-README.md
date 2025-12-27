@@ -2,45 +2,57 @@
 
 ## 📋 Overview
 
-This guide explains how to set up the complete database schema for the NestJS Stripe application with Role-Based Access Control (RBAC) system.
+This guide explains how to set up the clean database schema for the NestJS Stripe application with Role-Based Access Control (RBAC) system using separate schema and data files.
 
 ## 🗄️ Database Schema
 
-The complete schema includes **8 tables** with proper relationships and indexes:
+The clean schema includes **7 tables** with proper relationships and indexes:
 
 ### Core Business Tables
-1. **`users`** - System users with authentication
-2. **`products`** - Products/services offered
-3. **`orders`** - Customer orders and transactions
-4. **`payments`** - Payment records (optional additional tracking)
+1. **`users`** - System users with authentication and RBAC
+2. **`products`** - Products/services with multi-provider payment support
+3. **`orders`** - Customer orders with multi-payment provider support
 
 ### RBAC System Tables
-5. **`roles`** - System roles (ADMIN, STAFF, etc.)
-6. **`permissions`** - Granular permissions by module and action
-7. **`user_roles`** - Many-to-many: Users ↔ Roles
-8. **`role_permissions`** - Many-to-many: Roles ↔ Permissions
+4. **`roles`** - System roles (ADMIN, STAFF, REGISTERED USER)
+5. **`permissions`** - Granular permissions by module and action
+6. **`user_roles`** - Many-to-many: Users ↔ Roles
+7. **`role_permissions`** - Many-to-many: Roles ↔ Permissions
 
 ## 🚀 Quick Setup
 
-### Option 1: Automatic Setup (Recommended)
+### Option 1: Docker Compose (Recommended)
+
+1. **Start the services:**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Docker will automatically:**
+   - Create all tables from `schema.sql`
+   - Insert master data from `data.sql`
+   - Set up relationships and indexes
+
+### Option 2: Manual SQL Setup
+
+1. **Run schema first:**
+   ```bash
+   psql -h localhost -p 15432 -U postgres -d nestjs_stripe -f .docker/db/schema.sql
+   ```
+
+2. **Then run data:**
+   ```bash
+   psql -h localhost -p 15432 -U postgres -d nestjs_stripe -f .docker/db/data.sql
+   ```
+
+### Option 3: TypeORM Migration (Development)
 
 1. **Start the application:**
    ```bash
    npm run start:dev
    ```
 
-2. **TypeORM will automatically:**
-   - Create all tables
-   - Set up relationships
-   - Insert master data (roles & permissions)
-   - Add sample products
-
-### Option 2: Manual SQL Setup
-
-1. **Run the complete schema:**
-   ```bash
-   psql -h localhost -p 5432 -U postgres -d nestjs_stripe -f complete-database-schema.sql
-   ```
+2. **TypeORM will automatically create tables** (when `synchronize: true` in config)
 
 ## 📊 Master Data Included
 
@@ -182,11 +194,10 @@ WHERE u.id = :userId
 ## 📁 Files Structure
 
 ```
-database/
-├── complete-database-schema.sql    # Complete schema + master data
-├── rbac-schema.sql                 # RBAC tables only
-├── setup-rbac.sql                  # Setup script with verification
-└── DATABASE-README.md              # This guide
+.docker/db/
+├── schema.sql           # Clean database structure (tables, indexes, constraints)
+├── data.sql             # Master data (roles, permissions, sample products)
+└── DATABASE-README.md   # This guide
 ```
 
 ## ⚠️ Important Notes
