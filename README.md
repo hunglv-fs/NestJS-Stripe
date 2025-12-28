@@ -1,5 +1,7 @@
 # NestJS Stripe Payment System
 
+[![CI](https://github.com/hunglv-fs/NestJS-Stripe/workflows/CI/badge.svg)](https://github.com/hunglv-fs/NestJS-Stripe/actions)
+
 A payment processing system built with NestJS and Stripe integration.
 
 ## Setup
