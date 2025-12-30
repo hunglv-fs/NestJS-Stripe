@@ -40,13 +40,14 @@ services:
       context: .
       dockerfile: .docker/Dockerfile
     container_name: nestjs-stripe-web
+    env_file:
+      - .env
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USERNAME=postgres
       - DB_PASSWORD=123456
       - DB_NAME=nestjs_stripe
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
       - JWT_EXPIRES_IN=1h
     ports:
       - "3000:3000"
